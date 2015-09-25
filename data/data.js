@@ -16,8 +16,21 @@ db.testDB = function() {
 
 		// stmt.finalize();
 
+		// stmt = db.prepare('INSERT INTO person (name) VALUES(?)');
+
+		// for (var i = 0; i < 10; i++) {
+		// 	stmt.run('Ipsum ' + i);
+		// }
+
+		// stmt.finalize();
+
 		db.each('SELECT rowid AS id, name FROM groupT', function(err, row) {
-			console.log(row.id + ': ' + row.name);
+			console.log(row);
+		});
+		db.each('SELECT * FROM person', function(err, row) {
+			// console.log(row.rowid + ': ' + row.name + ' >> ' + 
+			// 	        row.groupId + ' >> ' + row.debt);
+			console.log(row);
 		});
 
 

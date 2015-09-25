@@ -27,7 +27,7 @@ db.dropDB = function() {
 
 // GROUPS
 db.insertGroup = function(name) {
-	db.run('INSERT INTO ' + groupTable + ' (name) ' +
+	db.run('INSERT INTO \'' + groupTable + '\' (name) ' +
 		   'VALUES( \'' + name + '\')');
 }
 
@@ -51,8 +51,12 @@ db.updateGroup = function(id, name) {
 }
 
 // PERSON
-db.insertPerson = function(name, groupId) {
-
+db.insertPerson = function(name, groupId, debt) {
+	db.run('INSERT INTO \'' + personTable + '\' ' +
+		   '(name, groupId, debt) ' +
+		   'VALUES( \'' + name + '\',' +
+		   	       '\'' + groupId + '\',' +
+		   	       debt +' )');
 }
 
 db.deletePerson = function(id) {

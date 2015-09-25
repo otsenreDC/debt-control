@@ -19,7 +19,7 @@ router.post('/', function(req, res, next) {
 	res.send('Groups/POST');
 	var name = req.body.name;
 	if (name) {
-	// db.insertGroup(name);
+		db.insertGroup(name);
 	} else {
 	// add to response
 	};
