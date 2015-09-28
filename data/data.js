@@ -24,10 +24,10 @@ db.testDB = function() {
 
 		// stmt.finalize();
 
-		db.each('SELECT rowid AS id, name FROM groupT', function(err, row) {
+		db.each('SELECT rowid AS id, name, groupId FROM groupT', function(err, row) {
 			console.log(row);
 		});
-		db.each('SELECT * FROM person', function(err, row) {
+		db.each('SELECT rowid as id, name, groupId, debt FROM person', function(err, row) {
 			// console.log(row.rowid + ': ' + row.name + ' >> ' + 
 			// 	        row.groupId + ' >> ' + row.debt);
 			console.log(row);

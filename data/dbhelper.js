@@ -1,5 +1,6 @@
-var sqlite3 = require('sqlite3').verbose();
+var utils = require('../models/utilities');
 
+var sqlite3 = require('sqlite3').verbose();
 var db = new sqlite3.Database('debts.db');
 
 var groupTable 		= 'groupT';
@@ -13,10 +14,14 @@ var personDebt		= 'debt';
 
 db.createDB = function() {
 	db.run('CREATE TABLE IF NOT EXISTS ' + groupTable +
-		   ' ( '+ groupName + ' TEXT, ' + groupId + ' TEXT)');
+		   ' ( '+ groupName + ' TEXT, ' + 
+		   	      groupId + ' TEXT UNIQUE NOT NULL)');
 
 	db.run('CREATE TABLE IF NOT EXISTS ' +  personTable + 
-		   ' ( ' + personName + ' TEXT, ' + personGroupId + ' TEXT, ' + personDebt + ' NUMBER)');
+		   ' ( ' + personName + ' TEXT, ' + 
+		   	       personGroupId + ' TEXT NOT NULL, ' +
+		   	       personDebt + ' NUMBER, ' +
+		   	       ' FOREIGN KEY (' + personGroupId + ') REFERENCES ' + groupTable + '(' + groupId + '))');
 }
 
 db.dropDB = function() {
@@ -27,8 +32,9 @@ db.dropDB = function() {
 
 // GROUPS
 db.insertGroup = function(name) {
-	db.run('INSERT INTO \'' + groupTable + '\' (name) ' +
-		   'VALUES( \'' + name + '\')');
+	db.run('INSERT INTO \'' + groupTable + '\' (name, groupId) ' +
+		   'VALUES( \'' + name + '\' ,' + 
+		   	       '\'' + utils.generateString() + '\')');
 }
 
 db.deleteGroup = function(id) {
@@ -36,7 +42,7 @@ db.deleteGroup = function(id) {
 }
 
 db.getGroup = function(id) {
-	db.each('SELECT rowid, ' + groupName + ', ' + groupId + 
+	db.each('SELECT * '  + 
 		    ' FROM ' + groupTable + 
 		    ' WHERE rowid = ' + id, 
 			function(err, row) {
@@ -60,15 +66,23 @@ db.insertPerson = function(name, groupId, debt) {
 }
 
 db.deletePerson = function(id) {
-
+	db.run('DELETE FROM ' + personTable + ' WHERE rowid = ' + id); 
 }
 
 db.getPerson = function(id) {
-
+	db.each('SELECT * ' + 
+			' FROM ' + personTable +
+			' WHERE rowid = ' + id, 
+			function(err, row) {
+				console.log(row);
+			});
 }
 
 db.updatePerson = function(id, name, debt) {
-
+	db.run("UPDATE " + personTable + 
+		   " SET name =  "+ "'" + name + "'," +
+		   " debt = " + debt +
+		   " WHERE rowid = " + id);
 }
 
 db.updatePersonDebt = function(id, debt) {
