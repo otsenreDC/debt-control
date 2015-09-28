@@ -3,9 +3,10 @@ var router = express.Router();
 var db = require("../data/dbhelper");
 var url = require("url");
 
-var getPersonById = function getPersonById(id) {
+var getPersonById = function getPersonById(id, callback) {
 	db.getPerson(id, function(person) {
 		console.log('row : ' + JSON.stringify(person));
+		callback(person);
 	});
 }
 
@@ -14,7 +15,6 @@ var getPersonsByGroupId = function getPersonsByGroupId(id) {
 }
 
 router.get('/', function(req, res, next) {
-	res.write('Person/GET');
 	var url_parts = url.parse(req.url, true);
 	var query = url_parts.query;
 	var type = query.type;
@@ -23,19 +23,24 @@ router.get('/', function(req, res, next) {
 	if (type) {
 		if (type === 'byId') {
 			if (typeof id === 'string') {
-				console.log(getPersonById(id));
+				getPersonById(id, function(person) {
+					res.setHeader('Content-Type', 'application/json');
+					res.send(JSON.stringify(person));
+				});
 			} else {
 				console.log("ID DATA TYPE ERROR");
+				res.end();
 			};
 		} else if (type === 'byGroupId') {
 			if (typeof id === 'string') {
 				getPersonsByGroupId(id);
+				res.end();
 			} else {
 				console.log("ID DATA TYPE ERROR");
+				res.end();
 			};
 		}
 	}
-	res.end();
 });
 
 router.post('/', function(req, res, next) {
