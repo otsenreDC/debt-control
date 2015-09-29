@@ -56,14 +56,6 @@ db.updateGroup = function(id, name) {
 		   ' WHERE rowid = ' + id);
 }
 
-// PERSON
-function Person(id, name, groupId, debt) {
-	this.id = id;
-	this.name = name;
-	this.groupId = groupId;
-	this.debt = debt;
-};
-
 db.insertPerson = function(name, groupId, debt) {
 	db.run('INSERT INTO \'' + personTable + '\' ' +
 		   '(name, groupId, debt) ' +
@@ -77,22 +69,21 @@ db.deletePerson = function(id) {
 }
 
 db.getPerson = function(id, callback) {
-	db.each('SELECT * ' + 
+	db.all('SELECT * ' + 
 			' FROM ' + personTable +
 			' WHERE rowid = ' + id, 
 			function(err, row) {
-				var person = new Person(row.rowid, row.name, row.groupId, row.debt);
-				callback(person);
+				callback(row);
 			});
 }
 
-db.getPersonsWithGroupId = function(id) {
-	console.log('AQUI');
-	db.each('SELECT * ' + 
+db.getPersonsWithGroupId = function(id, callback) {
+	var persons = [];
+	db.all('SELECT * ' + 
 		    ' FROM ' + personTable + 
 		    " WHERE groupId = '" + id + "'", 
-		    function(err, row) {
-		    	console.log(row);
+		    function(err, rows) {
+		    	callback(rows);
 		    });
 }
 db.updatePerson = function(id, name, debt, groupId) {
@@ -104,9 +95,14 @@ db.updatePerson = function(id, name, debt, groupId) {
 }
 
 db.updatePersonDebt = function(id, debt) {
-	db.run("UPDATE " + personTable +
-		   " SET debt = " + debt +
+	db.get("SELECT debt FROM person WHERE rowid = " + id, function(err, row) {
+		debt = parseInt(debt);
+		var oldDebt = parseInt(row.debt);
+		var newDebt = debt + oldDebt;
+		db.run("UPDATE " + personTable +
+		   " SET debt = " + newDebt +
 		   " WHERE rowid = " + id);
+	});
 }
 
 module.exports = db;

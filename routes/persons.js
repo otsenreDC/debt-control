@@ -3,17 +3,6 @@ var router = express.Router();
 var db = require("../data/dbhelper");
 var url = require("url");
 
-var getPersonById = function getPersonById(id, callback) {
-	db.getPerson(id, function(person) {
-		console.log('row : ' + JSON.stringify(person));
-		callback(person);
-	});
-}
-
-var getPersonsByGroupId = function getPersonsByGroupId(id) {
-	db.getPersonsWithGroupId(id);
-}
-
 router.get('/', function(req, res, next) {
 	var url_parts = url.parse(req.url, true);
 	var query = url_parts.query;
@@ -23,18 +12,18 @@ router.get('/', function(req, res, next) {
 	if (type) {
 		if (type === 'byId') {
 			if (typeof id === 'string') {
-				getPersonById(id, function(person) {
-					res.setHeader('Content-Type', 'application/json');
-					res.send(JSON.stringify(person));
+				db.getPerson(id, function(person) {
+					res.json(person);
 				});
 			} else {
-				console.log("ID DATA TYPE ERROR");
+				res.write("ID DATA TYPE ERROR");
 				res.end();
 			};
 		} else if (type === 'byGroupId') {
 			if (typeof id === 'string') {
-				getPersonsByGroupId(id);
-				res.end();
+				db.getPersonsWithGroupId(id, function(person) {
+					res.json(person);
+				});
 			} else {
 				console.log("ID DATA TYPE ERROR");
 				res.end();
@@ -77,6 +66,13 @@ router.put('/', function(req, res, next) {
 	var groupId = req.body.groupId;
 	console.log(name + debt + groupId);
 	db.updatePerson(id, name, debt, groupId);
+});
+
+router.put('/debt', function(req, res, next) {
+	var id = req.body.id;
+	var debt = req.body.debt;
+	db.updatePersonDebt(id, debt);
+	res.send('Person/debt/PUT');
 });
 
 module.exports = router;
